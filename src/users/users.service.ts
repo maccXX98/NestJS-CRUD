@@ -45,21 +45,14 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.userRepository
-      .createQueryBuilder('user')
-      .select([
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.password',
-        'user.createdAt',
-        'user.authStrategy',
-      ])
-      .getMany();
+    return this.userRepository.find();
   }
 
   async findOne(id: string) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['posts'],
+    });
 
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');

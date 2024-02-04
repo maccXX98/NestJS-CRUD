@@ -1,11 +1,14 @@
-import { Profile } from '../../profiles/entities/profile.entity';
 import {
   Column,
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
+
+import { Profile } from '../../profiles/entities/profile.entity';
+import { Post } from '../../posts/entities/post.entity';
 
 @Entity()
 export class User {
@@ -35,4 +38,7 @@ export class User {
   })
   @JoinColumn()
   public profile: Profile;
+
+  @OneToMany(() => Post, (post) => post.author, { lazy: true })
+  posts: Promise<Post[]>;
 }
