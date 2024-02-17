@@ -12,9 +12,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(3)
   @Matches(/^[A-Za-z\s]*$/, {
-    message: 'El nombre solo puede contener letras y espacios.',
+    message: 'El nombre de usuario solo puede contener letras y espacios.',
   })
-  userName: string;
+  username: string;
 
   @IsString()
   @IsNotEmpty()

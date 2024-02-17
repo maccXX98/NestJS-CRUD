@@ -6,9 +6,10 @@ import { DatabaseModule } from '../database/database.module';
 import { UsersService } from '../users/users.service';
 import { userProviders } from '../users/providers/user.providers';
 import { profileProviders } from '../profiles/providers/profile.providers';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, UsersModule],
   controllers: [PostsController],
   providers: [
     ...postProviders,
@@ -17,5 +18,6 @@ import { profileProviders } from '../profiles/providers/profile.providers';
     PostsService,
     UsersService,
   ],
+  exports: [PostsService],
 })
 export class PostsModule {}

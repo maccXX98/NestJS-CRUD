@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { Profile } from '../../profiles/entities/profile.entity';
@@ -16,12 +17,12 @@ export class User {
   public id: string;
 
   @Column({ length: 150 })
-  public userName: string;
+  public username: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   public email: string;
 
-  @Column()
+  @Column({ nullable: false })
   public password: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
@@ -29,6 +30,9 @@ export class User {
 
   @Column({ nullable: true })
   public authStrategy: string;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @OneToOne(() => Profile, {
     cascade: true,

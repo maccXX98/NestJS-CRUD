@@ -16,18 +16,16 @@ import { Profile } from '../profiles/entities/profile.entity';
 export class UsersService {
   constructor(
     @Inject('USER_REPOSITORY')
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
     @Inject('PROFILE_REPOSITORY')
-    private profileRepository: Repository<Profile>,
+    private readonly profileRepository: Repository<Profile>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.userRepository.create(createUserDto);
 
-    // Convertir el nombre a minúsculas
-    user.userName = user.userName.toLowerCase();
+    user.username = user.username.toLowerCase();
 
-    // Cifrar la contraseña
     const salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(user.password, salt);
 
@@ -35,7 +33,6 @@ export class UsersService {
       await this.userRepository.save(user);
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        // error code for unique_violation in MySQL
         throw new ConflictException('El correo electrónico ya está en uso.');
       }
       throw error;
@@ -68,18 +65,15 @@ export class UsersService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    // Convertir el nombre a minúsculas
-    if (updateUserDto.userName) {
-      user.userName = updateUserDto.userName.toLowerCase();
+    if (updateUserDto.username) {
+      user.username = updateUserDto.username.toLowerCase();
     }
 
-    // Cifrar la contraseña
     if (updateUserDto.password) {
       const salt = await bcrypt.genSalt();
       user.password = await bcrypt.hash(updateUserDto.password, salt);
     }
 
-    // Actualizar otros campos
     if (updateUserDto.email) {
       user.email = updateUserDto.email;
     }
@@ -91,7 +85,6 @@ export class UsersService {
       await this.userRepository.save(user);
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        // error code for unique_violation in MySQL
         throw new ConflictException('El correo electrónico ya está en uso.');
       }
       throw error;
@@ -121,5 +114,18 @@ export class UsersService {
     user.profile = savedProfile;
 
     return this.userRepository.save(user);
+  }
+
+  async findOneByUsernameOrEmail(usernameOrEmail: string) {
+    const user = await this.userRepository.findOne({
+      where: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+      relations: ['posts'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return user;
   }
 }
